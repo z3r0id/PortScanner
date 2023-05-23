@@ -33,7 +33,7 @@ class Scanner:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(float(tcp_timeout))
             #get the resulting connection
-            result = sock.connect_ex((target,port))
+            result = sock.connect_ex((target,int(port)))
 
             #check if port was open, then print and append to ports list
             if result == 0:
@@ -82,9 +82,14 @@ class Scanner:
     
     def process_queue(self,q,i):
         while True:
-            print("Getting item from thread" + str(i))
-            q.get()
-            #self.scan()
+            if self.debug == True:
+                print("[red bold] Getting item from thread" + str(i))
+            item = q.get()
+
+            split = item.split(":")
+            addr = split[0]
+            port = split[1]
+            self.scan(addr,port,self.tcp_timeout)
             q.task_done()
         return
     

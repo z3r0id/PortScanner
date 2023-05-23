@@ -9,6 +9,7 @@ from rich import print
 from rich.progress import track
 import scanner
 import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 parser = argparse.ArgumentParser(
     prog='''
@@ -132,7 +133,7 @@ addresses =[]
 live_addresses =[]
 ports =[]
 curl_values ={}
-
+addresses_and_ports = []
 
 #split and get the pieces of the address
 splitaddr = str(args.dest).split(".")
@@ -181,9 +182,12 @@ scanner.gen_threads(args.threads)
 #
 ### ITERATE AND SCAN PORTS
 #
-for d in track(addresses,description='[green bold] SCANNING NETWORK '):
+for d in track(addresses,description='[green bold] COMPILING THREAD QUEUE '):
     for p in ports:
-        scanner.q.put(scanner.scan(d,p,args.timeout))
+        # generate queue items encoded into a list of host:port combos
+        qitem = "{}:{}".format(d,p)
+        scanner.q.put(qitem)
+
 
 
 #
