@@ -35,7 +35,7 @@ parser.add_argument("-t", "--timeout", help="TCP Timeout",default="0.05")
 parser.add_argument("-o", "--output", help="File to output results to",default="scan_transcript.txt")
 parser.add_argument("--curl", help="curl any HTTP/s hosted on discovered ports", default=False, action="store_true")
 parser.add_argument("--wget", help="wget any FTP hosted on discovered ports", default=False, action="store_true")
-parser.add_argument("--debug", help="True/False turn on verbose debugging",default=False)
+parser.add_argument("--debug", help="True/False turn on verbose debugging",default=False,action="store_true")
 
 
 args = parser.parse_args()
@@ -243,9 +243,18 @@ for k,v in scanner.hosts_and_ports.items():
     p = t.add('[blue]' + str(v))
 
 
-print(tree)
-print("[green bold]SCAN COMPLETED IN: " + str(end_time - start_time)+"\n")
 
+
+print(tree)
+
+for k,v in scanner.hosts_and_ports.items():
+    if '80' in v:
+        print("[blue bold]Web interface identified: "+"[green bold]http://{}".format(k))
+    if '443' in v:
+        print("[blue bold]Web interface identified: "+"[green bold]https://{}".format(k))
+
+
+print("\n[green bold]SCAN COMPLETED IN: " + str(end_time - start_time)+"\n")
 #save the final results to a transcript file
 output(scanner.hosts_and_ports, args.output)
 
