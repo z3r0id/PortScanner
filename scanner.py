@@ -33,9 +33,15 @@ class Scanner:
             #create the connection
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(float(tcp_timeout))
+        except: 
+            pass
+        try:
             #get the resulting connection
             result = sock.connect_ex((target,int(port)))
-
+        except:
+            pass
+           
+        try:
             #check if port was open, then print and append to ports list
             if result == 0:
                 result = True
@@ -45,11 +51,13 @@ class Scanner:
                     self.hosts_and_ports[target] = [port]
                 else:
                     self.hosts_and_ports[target].append(port)
+                try:
+                    sock.close()
+                except:
+                    pass
 
-                sock.close()
                 if self.debug:
                     print("DEBUG: " + "Port {}:     [green]OPEN".format(port))
-                
             else:
                 result = False
                 if self.debug:

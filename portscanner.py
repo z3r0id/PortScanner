@@ -10,7 +10,6 @@ from rich.progress import track
 from rich.progress import Progress
 import scanner
 import datetime
-from concurrent.futures import ThreadPoolExecutor
 
 parser = argparse.ArgumentParser(
     prog='''
