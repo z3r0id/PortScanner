@@ -45,7 +45,7 @@ args = parser.parse_args()
 # FILE OUTPUT FUNCTION #
 ########################
 
-def output(results,fname):
+def output(results,banners,fname):
     ## expects results as a dict
 
     f = open("{}".format(fname),'a')
@@ -54,6 +54,8 @@ def output(results,fname):
 
     for k in results:
         f.write(k +": "+ str(results.get(k)) + "\n")
+    for b in banners:
+        f.write(b + "\n")
     f.write("""\n =======================================================\n
     """)
     f.close()
@@ -256,5 +258,5 @@ for k,v in scanner.hosts_and_ports.items():
 
 print("\n[green bold]SCAN COMPLETED IN: " + str(end_time - start_time)+"\n")
 #save the final results to a transcript file
-output(scanner.hosts_and_ports, args.output)
+output(scanner.hosts_and_ports, scanner.banners, args.output)
 

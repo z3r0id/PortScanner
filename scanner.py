@@ -15,6 +15,7 @@ class Scanner:
         self.q = Queue(maxsize=0)
         self.num_threads = 1
         self.debug = False
+        self.banners = []
 
 
 
@@ -49,8 +50,15 @@ class Scanner:
                 # add findings to hosts_and_ports
                 if target not in self.hosts_and_ports.keys():
                     self.hosts_and_ports[target] = [port]
+                    try:
+                        banner = sock.recv(1024)
+                        if banner:
+                            self.banners.append(str(target)+":"+str(port)+" -- "+ str(banner).strip("\\b,\\n,\',\\r'"))
+                    except:
+                        pass
                 else:
                     self.hosts_and_ports[target].append(port)
+                
                 try:
                     sock.close()
                 except:
