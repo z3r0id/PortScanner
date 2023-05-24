@@ -2,6 +2,7 @@ from queue import Queue
 from threading import Thread
 import socket
 from rich import print
+from rich.progress import track
 
 class Scanner:
     
@@ -81,14 +82,17 @@ class Scanner:
         return
     
     def process_queue(self,q,i):
-        while True:
+        while q.qsize:
             if self.debug == True:
                 print("[red bold] Getting item from thread" + str(i))
-            item = q.get()
 
+            item = q.get()
             split = item.split(":")
             addr = split[0]
             port = split[1]
+
+
+
             self.scan(addr,port,self.tcp_timeout)
             q.task_done()
         return

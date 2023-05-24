@@ -7,6 +7,7 @@ import rich
 from rich.tree import Tree
 from rich import print
 from rich.progress import track
+from rich.progress import Progress
 import scanner
 import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -189,7 +190,6 @@ for d in track(addresses,description='[green bold] COMPILING THREAD QUEUE '):
         scanner.q.put(qitem)
 
 
-
 #
 # CHECK FOR AND EXECUTE CURL/WGET
 # 
@@ -222,7 +222,10 @@ for d in track(addresses,description='[green bold] COMPILING THREAD QUEUE '):
             f.write(response)
             f.close()
 
+
+print("[green bold blink]WAITING FOR SCAN COMPLETION...")
 scanner.q.join()
+
 
 end_time = datetime.datetime.now()
 
