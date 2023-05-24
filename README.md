@@ -17,8 +17,6 @@ optional arguments:
                         TCP Timeout
   -o OUTPUT, --output OUTPUT
                         File to output results to
-  --curl                curl any HTTP/s hosted on discovered ports (IN DEVELOPMENT)
-  --wget                wget any FTP hosted on discovered ports (IN DEVELOPMENT)
   --debug               True/False turn on verbose debugging
 
 
