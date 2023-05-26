@@ -84,7 +84,10 @@ class Scanner:
             pass
 
         return result
-
+    
+    # 
+    # unused?
+    #
     def update_results(self,target,ports):
         self.hosts_and_ports[target] = ports
         if self.debug==True:

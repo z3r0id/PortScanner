@@ -33,8 +33,9 @@ parser.add_argument("-p", "--port", help="Single port or range, i.e 1-65535")
 parser.add_argument("-T", "--threads", help="max number of threads to be created when scanning", default=1)
 parser.add_argument("-t", "--timeout", help="TCP Timeout",default="0.05")
 parser.add_argument("-o", "--output", help="File to output results to",default="scan_transcript.txt")
-parser.add_argument("--curl", help="curl any HTTP/s hosted on discovered ports", default=False, action="store_true")
+#parser.add_argument("--curl", help="curl any HTTP/s hosted on discovered ports", default=False, action="store_true")
 parser.add_argument("--wget", help="wget any FTP hosted on discovered ports", default=False, action="store_true")
+parser.add_argument("--web", help="links any HTTP/s hosted on discovered ports", default=False, action="store_true")
 parser.add_argument("--debug", help="True/False turn on verbose debugging",default=False,action="store_true")
 
 
@@ -194,19 +195,19 @@ for d in track(addresses,description='[green bold] COMPILING THREAD QUEUE '):
 #
 # CHECK FOR AND EXECUTE CURL/WGET
 # 
-    if args.curl:
-        if args.debug:
-            print("DEBUG: [red]Executing curl()")
-        for h in scanner.hosts_and_ports.keys():
-            #format and curl the target addr:port
-            response = curl(h,'80')
+    # if args.curl:
+    #     if args.debug:
+    #         print("DEBUG: [red]Executing curl()")
+    #     for h in scanner.hosts_and_ports.keys():
+    #         #format and curl the target addr:port
+    #         response = curl(h,'80')
 
-            #write results to an html file
-            f = open("{}-80.html".format(h),'w')
-            if args.debug:
-                print("DEBUG: [red]writing curl results to {}".format(f.name))
-            f.write(response)
-            f.close()
+    #         #write results to an html file
+    #         f = open("{}-80.html".format(h),'w')
+    #         if args.debug:
+    #             print("DEBUG: [red]writing curl results to {}".format(f.name))
+    #         f.write(response)
+    #         f.close()
 
     if args.wget:
         if args.debug:
@@ -238,7 +239,7 @@ print('''
 
 print("""Live hosts found: 
 ==================""")
-#iterate through dict and format results into output file
+#iterate through dict and create results tree
 tree = Tree("+ Scan Results +")
 for k,v in scanner.hosts_and_ports.items():
     t = tree.add('[green]' + k)
@@ -246,17 +247,18 @@ for k,v in scanner.hosts_and_ports.items():
 
 
 
-
+#print results
 print(tree)
+if args.web:
+    for k,v in scanner.hosts_and_ports.items():
+        if '80' in v:
+            print("[blue bold]Web interface identified: "+"[green bold]http://{}".format(k))
+        if '443' in v:
+            print("[blue bold]Web interface identified: "+"[green bold]https://{}".format(k))
 
-for k,v in scanner.hosts_and_ports.items():
-    if '80' in v:
-        print("[blue bold]Web interface identified: "+"[green bold]http://{}".format(k))
-    if '443' in v:
-        print("[blue bold]Web interface identified: "+"[green bold]https://{}".format(k))
-
-
+#print completion time
 print("\n[green bold]SCAN COMPLETED IN: " + str(end_time - start_time)+"\n")
+
 #save the final results to a transcript file
 output(scanner.hosts_and_ports, scanner.banners, args.output)
 
