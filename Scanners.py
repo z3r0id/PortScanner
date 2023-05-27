@@ -5,9 +5,35 @@ from rich import print
 from rich.progress import track
 
 class Scanner:
-    
-    # DEFINE ATTRIBUTES
-    def __init__(self,num_threads,tcp_timeout,q,addresses,ports):
+    """Primary Scanner class for basic TCP scanning.
+:attribute num_threads: int - number of threads for execution
+:attribute tcp_timeout: float - TCP connect timeout
+:attribute addresses: list - IP addresses to scan
+:attribute ports: list - TCP ports to scan
+
+:method scan(target,port,tcp_timeout)
+:method gen_threads(num_threads)
+:method process_queue(q,i) 
+#i is an int within range to track the number of threads
+    """
+    # TO IMPLEMENT Queue/Threads:
+    # ====================================
+    # scanner.gen_threads(num_threads)
+    # qitem = "{}:{}".format(destination,port)
+    # scanner.q.put(qitem)
+    # scanner.q.join()
+
+    # TO EXTEND TO NEW SCANNER SCAN TYPE
+    #=====================================
+    # overwrite scanner.gen_threads() to point to a new scan() 
+    # (only necessary because may have different # of args)
+    # overwrite the scan() function with new scanning code
+
+                  ################
+                  #  ATTRIBUTES  #
+######################################################
+
+    def __init__(self,num_threads,tcp_timeout,addresses,ports):
         self.addresses = []
         self.ports = []
         self.hosts_and_ports = {}
@@ -23,10 +49,7 @@ class Scanner:
                   # METHODS HERE #
 ######################################################
 
-
-
     def scan(self,target,port,tcp_timeout):
-
         if self.debug==True:
             ("scanning...{} PORT: {} ".format(target,port))
     
@@ -47,25 +70,24 @@ class Scanner:
             if result == 0:
                 result = True
 
-                # add findings to hosts_and_ports
-                if target not in self.hosts_and_ports.keys():
-                    self.hosts_and_ports[target] = [port]
-                    try:
+                # add the found host and/or port to the hosts_and_ports dict
+                self.update_results(target,port)
+
+                #perform a banner grab if the port is open
+                try:
                         banner = sock.recv(1024)
                         if banner:
                             self.banners.append(str(target)+":"+str(port)+" -- "+ str(banner).strip("\\b,\\n,\',\\r'"))
-                    except:
-                        pass
-                else:
-                    self.hosts_and_ports[target].append(port)
-                
+                except:
+                    pass
+                #now close it up
                 try:
                     sock.close()
                 except:
                     pass
-
                 if self.debug:
                     print("DEBUG: " + "Port {}:     [green]OPEN".format(port))
+
             else:
                 result = False
                 if self.debug:
@@ -84,14 +106,19 @@ class Scanner:
             pass
 
         return result
-    
-    # 
-    # unused?
-    #
-    def update_results(self,target,ports):
-        self.hosts_and_ports[target] = ports
+  
+
+
+    def update_results(self,target,port):
+        #if the host isn't there, add it
+        if target not in self.hosts_and_ports.keys():
+            self.hosts_and_ports[target] = [port]
+        else:
+            #if the host is there, append the port
+            self.hosts_and_ports[target].append(port)
+
         if self.debug==True:
-            print("updating{}:{}".format(target,ports))
+            print("updating{}:{}".format(target,port))
 
 
     def gen_threads(self,num_threads):
@@ -100,6 +127,7 @@ class Scanner:
             worker.start()
         return
     
+
     def process_queue(self,q,i):
         while q.qsize:
             if self.debug == True:
@@ -110,13 +138,21 @@ class Scanner:
             addr = split[0]
             port = split[1]
 
-
-
             self.scan(addr,port,self.tcp_timeout)
             q.task_done()
         return
     
-    # to implement Queue/Threads:
-    # scanner.gen_threads(num_threads,q)
-    # scanner.q.put(function())
-    # scanner.q.join()
+
+#############################################################################
+#############################################################################
+
+class UDP_Scanner(Scanner):
+    """Basic UDP scan of IP/port range || Inherits from Scanner class.
+    """
+    def __init__(self,num_threads,tcp_timeout,addresses,ports):
+        pass
+
+    def udpscan(self, target, port):
+
+        # UDP SCAN FUNCTION HERE
+        self.update_results(target,port)
